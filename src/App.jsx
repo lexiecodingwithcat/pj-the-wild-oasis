@@ -1,20 +1,16 @@
-import styled from "styled-components";
 import GlobalStyles from "./styles/GlobalStyles";
-import  Button  from "./ui/Button";
-//this will return a styled component
-//and the css we wrote only limit to the current file scope
-const H1 = styled.h1`
-  font-size: 30px;
-  font-weight: 600;
-  color: red;
-`;
+import Button from "./ui/Button";
+import Heading from "./ui/Heading";
 
 function App() {
   return (
     <>
       <GlobalStyles />
       <div>
-        <H1>Hello world</H1>
+        {/* using "as" prop so that the styled component will know which HTML element need to be rendered exactly */}
+        <Heading as="h1">The Wild Oasis</Heading>
+        <Heading as="h2">Check in and out</Heading>
+        <Heading as="h3">Form</Heading>
         <Button>Check in</Button>
       </div>
     </>
