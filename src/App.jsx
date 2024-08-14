@@ -10,6 +10,8 @@ import Users from "./pages/Users";
 import PageNotFound from "./pages/PageNotFound";
 import AppLayout from "./ui/AppLayout";
 
+
+
 const router = createBrowserRouter([
   {
     //layout is just a container which used to wrap the same component each route will render
