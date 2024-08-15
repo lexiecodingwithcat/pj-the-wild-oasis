@@ -13,7 +13,7 @@ import PageNotFound from "./pages/PageNotFound";
 import AppLayout from "./ui/AppLayout";
 
 
-//we set up queryClient to save data
+//we set up queryClient to have data in one place like redux and Context API
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -42,7 +42,7 @@ const router = createBrowserRouter([
   { path: "*", element: <PageNotFound /> },
 ]);
 function App() {
-  {/*2. povide the data to the application  */ }
+  {/*2. povide the data to the entire application tree */ }
   return (
     <QueryClientProvider client={queryClient}>
       {/* the devtool panel is closed by default*/}
