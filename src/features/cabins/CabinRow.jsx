@@ -1,5 +1,8 @@
 import styled from "styled-components";
 import { formatCurrency } from "../../utils/helpers";
+import { deleteCabins } from "../../services/apiCabins";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
 /* eslint-disable react/prop-types */
 
 const TableRow = styled.div`
@@ -42,7 +45,29 @@ const Discount = styled.div`
 `;
 
 function CabinRow({ cabin }) {
-  const { name, maxCapacity, regularPrice, discount, image } = cabin;
+  const {
+    id: cabinId,
+    name,
+    maxCapacity,
+    regularPrice,
+    discount,
+    image,
+  } = cabin;
+  //since the invalidQuery is inside queryClient, we we need to get query client first
+  const queryClinet = useQueryClient();
+  // the mutate function is a callback function we can connect with the button
+  const { isLoading: isDeleting, mutate } = useMutation({
+    mutationFn: () => deleteCabins(cabinId),
+    //tell React waht to do as soon as the mutation is successful
+    onSuccess: () => {
+      alert("cabin successfully deleted");
+      //fetch the cabin data again by specifying the queryKey
+      queryClinet.invalidateQueries({ queryKey: ["cabins"] });
+    },
+    //the err.message will display the message we wrote in deleteCabin function 
+    onError: (err) => alert(err.message),
+  });
+
   return (
     <TableRow role="row">
       <Img src={image} />
@@ -50,7 +75,9 @@ function CabinRow({ cabin }) {
       <div>Fits up to {maxCapacity}</div>
       <Price>{formatCurrency(regularPrice)}</Price>
       <Discount>{formatCurrency(discount)}</Discount>
-      <button>Delete</button>
+      <button onClick={() => mutate(cabinId)} disabled={isDeleting}>
+        Delete
+      </button>
     </TableRow>
   );
 }
