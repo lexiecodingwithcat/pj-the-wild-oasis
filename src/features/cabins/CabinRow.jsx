@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { formatCurrency } from "../../utils/helpers";
 import { deleteCabins } from "../../services/apiCabins";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 /* eslint-disable react/prop-types */
 
@@ -60,12 +61,12 @@ function CabinRow({ cabin }) {
     mutationFn: () => deleteCabins(cabinId),
     //tell React waht to do as soon as the mutation is successful
     onSuccess: () => {
-      alert("cabin successfully deleted");
+      toast.success("cabin successfully deleted");
       //fetch the cabin data again by specifying the queryKey
       queryClinet.invalidateQueries({ queryKey: ["cabins"] });
     },
-    //the err.message will display the message we wrote in deleteCabin function 
-    onError: (err) => alert(err.message),
+    //the err.message will display the message we wrote in deleteCabin function
+    onError: (err) => toast.error(err.message),
   });
 
   return (
