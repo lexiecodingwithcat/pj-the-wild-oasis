@@ -19,7 +19,7 @@ const TableRow = styled.div`
 `;
 
 const Img = styled.img`
-  display: block;
+  display: block ;
   width: 6.4rem;
   aspect-ratio: 3 / 2;
   object-fit: cover;

@@ -1,8 +1,11 @@
 // import { useEffect } from "react";
 import Heading from "../ui/Heading";
 import Row from "../ui/Row";
+import Button from "../ui/Button";
 
 import CabinTable from "../features/cabins/CabinTable";
+import CreateCabinForm from "../features/cabins/CreateCabinForm";
+import { useState } from "react";
 function Cabins() {
   // useEffect(
   //   function () {
@@ -10,6 +13,7 @@ function Cabins() {
   //   },
   //   [getCabins]
   // );
+  const [showForm, setShowForm] = useState(false);
 
   return (
     // because we want the children element only return the main section, no other div to affect the styles
@@ -21,6 +25,10 @@ function Cabins() {
       </Row>
       <Row>
         <CabinTable />
+        <Button onClick={() => setShowForm((show) => !show)}>
+          Add new cabin
+        </Button>
+        {showForm && <CreateCabinForm />}
       </Row>
     </>
   );
