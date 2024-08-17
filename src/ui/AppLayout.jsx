@@ -5,6 +5,8 @@ import styled from "styled-components";
 const Main = styled.main`
   background-color: var(--color-grey-50);
   padding: 4rem 4.8rem 6.4rem;
+  //only the main container will scroll while header and sidebar stays the same
+  overflow: scroll;
 `;
 const StyledAppLayout = styled.div`
   display: grid;
