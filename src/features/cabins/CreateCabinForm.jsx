@@ -34,8 +34,8 @@ function CreateCabinForm() {
   const { errors } = formState;
 
   function onSubmitForm(data) {
-    if (data.image === "") data.image = null;
-    mutate(data);
+  console.log(data)
+    mutate({...data, image:data.image.at(0)});
   }
   //it receives the actual error so that we can check it in the console
   function onError(errors) {
@@ -52,6 +52,7 @@ function CreateCabinForm() {
           type="text"
           id="name"
           {...register("name", { required: "This field is required" })}
+          disabled={isCreating}
         />
       </FormRow>
 
@@ -67,6 +68,7 @@ function CreateCabinForm() {
               message: "Capacity should be at least one",
             },
           })}
+          disabled={isCreating}
         />
       </FormRow>
 
@@ -75,6 +77,7 @@ function CreateCabinForm() {
           type="number"
           id="regularPrice"
           {...register("regularPrice", { required: "This field is required" })}
+          disabled={isCreating}
         />
       </FormRow>
 
@@ -92,6 +95,7 @@ function CreateCabinForm() {
               //pass as a message
               "Disocunt should be less than the regular price",
           })}
+          disabled={isCreating}
         />
       </FormRow>
 
@@ -104,11 +108,17 @@ function CreateCabinForm() {
           id="description"
           defaultValue=""
           {...register("description", { required: "This field is required" })}
+          disabled={isCreating}
         />
       </FormRow>
 
       <FormRow label="Cabin photo">
-        <FileInput id="image" accept="image/*" {...register("image")} />
+        <FileInput
+          id="image"
+          accept="image/*"
+          // type="file"
+          {...register("image")}
+        />
       </FormRow>
 
       <FormRow>
