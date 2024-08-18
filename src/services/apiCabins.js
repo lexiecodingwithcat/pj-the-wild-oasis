@@ -24,10 +24,10 @@ export async function createCabin(newCabin) {
   //then we create URL to store it inside the cabin row
   //https://umwgqlsbzxfpbimlmorc.supabase.co/storage/v1/object/public/cabin-images/cabin-001.jpg
   const imagePath = `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`;
-  //1.create cabin
+  //1.create new cabin to save the data into DB
   const { data, error } = await supabase
     .from("cabins")
-    .insert([{...newCabin, image:imagePath}])
+    .insert([{ ...newCabin, image: imagePath }])
     .select();
 
   if (error) {
@@ -35,8 +35,22 @@ export async function createCabin(newCabin) {
     throw new Error("Cabin could not be created");
   }
   //2. if the cabin has been created successfully, we upload the image
-  //we need to specify the image path: the path including image name so that we can connect it with the row
+  //upload image
+  const { error: storageError } = await supabase.storage
+    .from("cabin-images")
+    .upload(imageName, newCabin.image, {
+      cacheControl: "3600",
+      upsert: false,
+    });
 
+  //3. delete the cabin IF there was an error uploading the corresponding image
+  if (storageError) {
+    //we need to use data.id because newCabin does not have this value
+    //the id is the PK generated in DB
+    await supabase.from("cabins").delete().eq("id", data.id);
+    console.error(storageError);
+    throw new Error("Cabin image could not be uploaded and cabin was not created");
+  }
   return data;
 }
 

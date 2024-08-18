@@ -35,7 +35,7 @@ function CreateCabinForm() {
 
   function onSubmitForm(data) {
   console.log(data)
-    mutate({...data, image:data.image.at(0)});
+    mutate({...data, image:data.image[0]});
   }
   //it receives the actual error so that we can check it in the console
   function onError(errors) {
