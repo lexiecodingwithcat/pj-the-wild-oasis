@@ -12,8 +12,10 @@ export async function getCabins() {
   }
   return data;
 }
+// we also need to pass editID so that we will know if we are in the editSession
+export async function createEditCabin(newCabin, id) {
 
-export async function createCabin(newCabin) {
+  
   //to make sure each image name is unique, we create random prefix for them
   //because if there is "/" supdabase will create a new folder
   // so we need to prevent that by replacing "/" with ""
@@ -24,16 +26,27 @@ export async function createCabin(newCabin) {
   //then we create URL to store it inside the cabin row
   //https://umwgqlsbzxfpbimlmorc.supabase.co/storage/v1/object/public/cabin-images/cabin-001.jpg
   const imagePath = `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`;
-  //1.create new cabin to save the data into DB
-  const { data, error } = await supabase
-    .from("cabins")
-    .insert([{ ...newCabin, image: imagePath }])
-    .select();
-
+  //1.create/edit new cabin to save the data into DB
+  let query = await supabase.from("cabins");
+  //A) CREATE
+  if (!id) {
+    //an array basically is a row
+    query.insert([{ ...newCabin, image: imagePath }]);
+  }
+  //B) EDIT
+  if (id) {
+    query
+      //we pass an object instead of array because we have selected this row using id
+      .update({ ...newCabin, image: imagePath })
+      // we only update when the field id is equal to in id passed in
+      .eq("id", id);
+  }
+  const { data, error } = query.select();
   if (error) {
     console.error(error);
     throw new Error("Cabin could not be created");
   }
+
   //2. if the cabin has been created successfully, we upload the image
   //upload image
   const { error: storageError } = await supabase.storage
@@ -49,7 +62,9 @@ export async function createCabin(newCabin) {
     //the id is the PK generated in DB
     await supabase.from("cabins").delete().eq("id", data.id);
     console.error(storageError);
-    throw new Error("Cabin image could not be uploaded and cabin was not created");
+    throw new Error(
+      "Cabin image could not be uploaded and cabin was not created"
+    );
   }
   return data;
 }

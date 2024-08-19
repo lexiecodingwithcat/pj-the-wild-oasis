@@ -1,33 +1,22 @@
 import toast from "react-hot-toast";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 /* eslint-disable no-unused-vars*/
-/*eslint-disable react/prop-types */
 import Input from "../../ui/Input";
 import Form from "../../ui/Form";
 import Button from "../../ui/Button";
 import FileInput from "../../ui/FileInput";
 import Textarea from "../../ui/Textarea";
 import FormRow from "../../ui/FormRow";
-
 import { useForm } from "react-hook-form";
-import { createEditCabin } from "../../services/apiCabins";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createCabin } from "../../services/apiCabins";
 
-function CreateCabinForm({ cabinToEdit = {} }) {
-  //put other properties into the editValue object
-  const { id: editId, ...editValues } = cabinToEdit;
-  //we need a variable to control whether we want to edit/ create a cabin
-  //if there is an edit id then true
-  const isEditSession = Boolean(editId);
-
+function CreateCabinForm() {
   //getValues can be the function to get values within this hook Form
-  const { register, handleSubmit, reset, getValues, formState } = useForm({
-    //if it is an editSession, we use the editValues as default values, if not just an epmty object
-    defaultValues: isEditSession ? editValues : {},
-  });
+  const { register, handleSubmit, reset, getValues, formState } = useForm();
   const queryClient = useQueryClient();
   //useMutation to create new cabin and do the re-validation
   const { isLoading: isCreating, mutate } = useMutation({
-    mutationFn: createEditCabin,
+    mutationFn: createCabin,
     //same as:
     //mutationFn: newCabin => createCabin(newCabin),
     onSuccess: () => {
@@ -45,8 +34,8 @@ function CreateCabinForm({ cabinToEdit = {} }) {
   const { errors } = formState;
 
   function onSubmitForm(data) {
-    console.log(data);
-    mutate({ ...data, image: data.image[0] });
+  console.log(data)
+    mutate({...data, image:data.image[0]});
   }
   //it receives the actual error so that we can check it in the console
   function onError(errors) {
@@ -118,9 +107,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
           type="number"
           id="description"
           defaultValue=""
-          {...register("description", {
-            required: isEditSession ? false : "This field is required",
-          })}
+          {...register("description", { required: "This field is required" })}
           disabled={isCreating}
         />
       </FormRow>
@@ -139,9 +126,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
         <Button variation="secondary" type="reset">
           Cancel
         </Button>
-        <Button disabled={isCreating}>
-          {isEditSession ? "Edit Cabin" : "Create new Cabin"}
-        </Button>
+        <Button disabled={isCreating}>Add Cabin</Button>
       </FormRow>
     </Form>
   );

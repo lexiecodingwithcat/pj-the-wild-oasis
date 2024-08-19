@@ -3,7 +3,8 @@ import { formatCurrency } from "../../utils/helpers";
 import { deleteCabins } from "../../services/apiCabins";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-
+import { useState } from "react";
+import CreateCabinForm from "./CreateCabinForm"
 /* eslint-disable react/prop-types */
 
 const TableRow = styled.div`
@@ -19,7 +20,7 @@ const TableRow = styled.div`
 `;
 
 const Img = styled.img`
-  display: block ;
+  display: block;
   width: 6.4rem;
   aspect-ratio: 3 / 2;
   object-fit: cover;
@@ -68,18 +69,27 @@ function CabinRow({ cabin }) {
     //the err.message will display the message we wrote in deleteCabin function
     onError: (err) => toast.error(err.message),
   });
+  //create a state to control the displaying of form
+  const [showForm, setShowForm] = useState(false);
 
   return (
-    <TableRow role="row">
-      <Img src={image} />
-      <Cabin>{name}</Cabin>
-      <div>Fits up to {maxCapacity}</div>
-      <Price>{formatCurrency(regularPrice)}</Price>
-      <Discount>{formatCurrency(discount)}</Discount>
-      <button onClick={() => mutate(cabinId)} disabled={isDeleting}>
-        Delete
-      </button>
-    </TableRow>
+    <>
+      <TableRow role="row">
+        <Img src={image} />
+        <Cabin>{name}</Cabin>
+        <div>Fits up to {maxCapacity}</div>
+        <Price>{formatCurrency(regularPrice)}</Price>
+        <Discount>{formatCurrency(discount)}</Discount>
+        <div>
+          <button onClick={() => setShowForm((show) => !show)}>Edit</button>
+          <button onClick={() => mutate(cabinId)} disabled={isDeleting}>
+            Delete
+          </button>
+        </div>
+      </TableRow>
+      {/* and we need to pass data to the form to pre-fill the form */}
+      {showForm && <CreateCabinForm cabinToEdit={cabin}/>}
+    </>
   );
 }
 
