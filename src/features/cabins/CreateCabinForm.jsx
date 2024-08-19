@@ -26,7 +26,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
   });
   const queryClient = useQueryClient();
   //useMutation to create new cabin and do the re-validation
-  const { isLoading: isCreating, mutate } = useMutation({
+  const { isLoading: isCreating, mutate: createCabin } = useMutation({
     mutationFn: createEditCabin,
     //same as:
     //mutationFn: newCabin => createCabin(newCabin),
@@ -45,16 +45,32 @@ function CreateCabinForm({ cabinToEdit = {} }) {
   const { errors } = formState;
 
   function onSubmitForm(data) {
-    console.log(data);
-    mutate({ ...data, image: data.image[0] });
+    //we need to handle different situations
+    //CHECK THE IMAGE TYPE
+    const image = typeof data.image === "string" ? data.image : data.image[0];
+    if (isEditSession)
+      editCabin({ newCabinData: { ...data, image }, id: editId });
+    else createCabin({ ...data, image: image });
   }
   //it receives the actual error so that we can check it in the console
   function onError(errors) {
     console.log(errors);
   }
+
+  //we need another mutation to edit the form
+  const { isLoading: isEditting, mutate: editCabin } = useMutation({
+    mutationFn: ({ newCabinData, id }) => createEditCabin(newCabinData, id),
+    onSuccess: () => {
+      toast.success("Cabin has been successfullt editted");
+      queryClient.invalidateQueries({ queryKey: ["cabins"] });
+    },
+    onError: (err) => toast.error(err.message),
+  });
+
+  const isWorking = isCreating || isEditting;
   return (
     //this handleSubmit is the one we received from useForm hook
-    //in the handleSubmit function, we call the  function we created our own
+    //in the handleSubmit function of react hook form, we call the  function we created our own
     //when the form attampts to submit, the validation will be executed. if there is any error, the handleSubmit function won't call onSubmitForm function
     //instead, it willl call the second function we passed in, which is the onError
     <Form onSubmit={handleSubmit(onSubmitForm, onError)}>
@@ -63,7 +79,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
           type="text"
           id="name"
           {...register("name", { required: "This field is required" })}
-          disabled={isCreating}
+          disabled={isWorking}
         />
       </FormRow>
 
@@ -79,7 +95,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
               message: "Capacity should be at least one",
             },
           })}
-          disabled={isCreating}
+          disabled={isWorking}
         />
       </FormRow>
 
@@ -88,7 +104,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
           type="number"
           id="regularPrice"
           {...register("regularPrice", { required: "This field is required" })}
-          disabled={isCreating}
+          disabled={isWorking}
         />
       </FormRow>
 
@@ -106,7 +122,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
               //pass as a message
               "Disocunt should be less than the regular price",
           })}
-          disabled={isCreating}
+          disabled={isWorking}
         />
       </FormRow>
 
@@ -121,7 +137,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
           {...register("description", {
             required: isEditSession ? false : "This field is required",
           })}
-          disabled={isCreating}
+          disabled={isWorking}
         />
       </FormRow>
 
@@ -139,7 +155,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
         <Button variation="secondary" type="reset">
           Cancel
         </Button>
-        <Button disabled={isCreating}>
+        <Button disabled={isWorking}>
           {isEditSession ? "Edit Cabin" : "Create new Cabin"}
         </Button>
       </FormRow>

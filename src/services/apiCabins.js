@@ -14,8 +14,9 @@ export async function getCabins() {
 }
 // we also need to pass editID so that we will know if we are in the editSession
 export async function createEditCabin(newCabin, id) {
+  //if the imagePatgh caontains supabase as its prefix, it means we are editting the cabin
+  const hasImagePath = newCabin.image?.startsWith?.(supabaseUrl);
 
-  
   //to make sure each image name is unique, we create random prefix for them
   //because if there is "/" supdabase will create a new folder
   // so we need to prevent that by replacing "/" with ""
@@ -23,25 +24,28 @@ export async function createEditCabin(newCabin, id) {
     "/",
     ""
   );
-  //then we create URL to store it inside the cabin row
-  //https://umwgqlsbzxfpbimlmorc.supabase.co/storage/v1/object/public/cabin-images/cabin-001.jpg
-  const imagePath = `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`;
+  //then we create URL to store it inside the cabin row if there is no imagePath
+  // if there is an imagePath, just keep it
+  const imagePath = hasImagePath
+    ? newCabin.image
+    : `${supabaseUrl}/storage/v1/object/public/cabin-images/${imageName}`;
   //1.create/edit new cabin to save the data into DB
-  let query = await supabase.from("cabins");
+  let query = supabase.from("cabins");
   //A) CREATE
   if (!id) {
     //an array basically is a row
-    query.insert([{ ...newCabin, image: imagePath }]);
+    query = query.insert([{ ...newCabin, image: imagePath }]);
   }
   //B) EDIT
   if (id) {
-    query
+    query = query
       //we pass an object instead of array because we have selected this row using id
       .update({ ...newCabin, image: imagePath })
       // we only update when the field id is equal to in id passed in
       .eq("id", id);
   }
-  const { data, error } = query.select();
+  const { data, error } = await query.select();
+
   if (error) {
     console.error(error);
     throw new Error("Cabin could not be created");
