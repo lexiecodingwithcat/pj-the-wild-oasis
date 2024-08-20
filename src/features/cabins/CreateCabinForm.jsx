@@ -1,5 +1,5 @@
-import toast from "react-hot-toast";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+import { useQueryClient } from "@tanstack/react-query";
 /* eslint-disable no-unused-vars*/
 /*eslint-disable react/prop-types */
 import Input from "../../ui/Input";
@@ -10,7 +10,8 @@ import Textarea from "../../ui/Textarea";
 import FormRow from "../../ui/FormRow";
 
 import { useForm } from "react-hook-form";
-import { createEditCabin } from "../../services/apiCabins";
+import { useCraeteCabin } from "./useCreateCabin";
+import { useEditCabin } from "./useEditCabin";
 
 function CreateCabinForm({ cabinToEdit = {} }) {
   //put other properties into the editValue object
@@ -24,48 +25,38 @@ function CreateCabinForm({ cabinToEdit = {} }) {
     //if it is an editSession, we use the editValues as default values, if not just an epmty object
     defaultValues: isEditSession ? editValues : {},
   });
+
   const queryClient = useQueryClient();
-  //useMutation to create new cabin and do the re-validation
-  const { isLoading: isCreating, mutate: createCabin } = useMutation({
-    mutationFn: createEditCabin,
-    //same as:
-    //mutationFn: newCabin => createCabin(newCabin),
-    onSuccess: () => {
-      toast.success("New cabin successfully created");
-      //we also need to re-fetch the data using queryClient
-      queryClient.invalidateQueries({ queryKey: ["cabins"] });
-      //after submission, reset the form
-      reset();
-    },
-    onError: (err) => toast.error(err.message),
-  });
 
   //we need to get error from console and display it into the UI
   //formState is an object
   const { errors } = formState;
-
+  const { isCreating, createCabin } = useCraeteCabin();
+  const { isEditting, editCabin } = useEditCabin();
   function onSubmitForm(data) {
     //we need to handle different situations
     //CHECK THE IMAGE TYPE
     const image = typeof data.image === "string" ? data.image : data.image[0];
     if (isEditSession)
-      editCabin({ newCabinData: { ...data, image }, id: editId });
-    else createCabin({ ...data, image: image });
+      editCabin(
+        { newCabinData: { ...data, image }, id: editId },
+        { onSuccess: () => reset() }
+      );
+    else {
+      //this is the mutation function so we can get access to the onSuccess
+      //since we are not able to place reset and useForm hook inside our custom hooks ( has a default value)
+      createCabin(
+        { ...data, image: image },
+        {
+          onSuccess: () => reset(),
+        }
+      );
+    }
   }
   //it receives the actual error so that we can check it in the console
   function onError(errors) {
     console.log(errors);
   }
-
-  //we need another mutation to edit the form
-  const { isLoading: isEditting, mutate: editCabin } = useMutation({
-    mutationFn: ({ newCabinData, id }) => createEditCabin(newCabinData, id),
-    onSuccess: () => {
-      toast.success("Cabin has been successfullt editted");
-      queryClient.invalidateQueries({ queryKey: ["cabins"] });
-    },
-    onError: (err) => toast.error(err.message),
-  });
 
   const isWorking = isCreating || isEditting;
   return (
