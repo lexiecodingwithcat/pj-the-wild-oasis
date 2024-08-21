@@ -1,67 +1,49 @@
-
-import { useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 /* eslint-disable no-unused-vars*/
-/*eslint-disable react/prop-types */
 import Input from "../../ui/Input";
 import Form from "../../ui/Form";
 import Button from "../../ui/Button";
 import FileInput from "../../ui/FileInput";
 import Textarea from "../../ui/Textarea";
 import FormRow from "../../ui/FormRow";
-
 import { useForm } from "react-hook-form";
-import { useCraeteCabin } from "./useCreateCabin";
-import { useEditCabin } from "./useEditCabin";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createCabin } from "../../services/apiCabins";
 
-function CreateCabinForm({ cabinToEdit = {} }) {
-  //put other properties into the editValue object
-  const { id: editId, ...editValues } = cabinToEdit;
-  //we need a variable to control whether we want to edit/ create a cabin
-  //if there is an edit id then true
-  const isEditSession = Boolean(editId);
-
+function CreateCabinForm() {
   //getValues can be the function to get values within this hook Form
-  const { register, handleSubmit, reset, getValues, formState } = useForm({
-    //if it is an editSession, we use the editValues as default values, if not just an epmty object
-    defaultValues: isEditSession ? editValues : {},
-  });
-
+  const { register, handleSubmit, reset, getValues, formState } = useForm();
   const queryClient = useQueryClient();
+  //useMutation to create new cabin and do the re-validation
+  const { isLoading: isCreating, mutate } = useMutation({
+    mutationFn: createCabin,
+    //same as:
+    //mutationFn: newCabin => createCabin(newCabin),
+    onSuccess: () => {
+      toast.success("New cabin successfully created");
+      //we also need to re-fetch the data using queryClient
+      queryClient.invalidateQueries({ queryKey: ["cabins"] });
+      //after submission, reset the form
+      reset();
+    },
+    onError: (err) => toast.error(err.message),
+  });
 
   //we need to get error from console and display it into the UI
   //formState is an object
   const { errors } = formState;
-  const { isCreating, createCabin } = useCraeteCabin();
-  const { isEditting, editCabin } = useEditCabin();
+
   function onSubmitForm(data) {
-    //we need to handle different situations
-    //CHECK THE IMAGE TYPE
-    const image = typeof data.image === "string" ? data.image : data.image[0];
-    if (isEditSession)
-      editCabin(
-        { newCabinData: { ...data, image }, id: editId },
-        { onSuccess: () => reset() }
-      );
-    else {
-      //this is the mutation function so we can get access to the onSuccess
-      //since we are not able to place reset and useForm hook inside our custom hooks ( has a default value)
-      createCabin(
-        { ...data, image: image },
-        {
-          onSuccess: () => reset(),
-        }
-      );
-    }
+  console.log(data)
+    mutate({...data, image:data.image[0]});
   }
   //it receives the actual error so that we can check it in the console
   function onError(errors) {
     console.log(errors);
   }
-
-  const isWorking = isCreating || isEditting;
   return (
     //this handleSubmit is the one we received from useForm hook
-    //in the handleSubmit function of react hook form, we call the  function we created our own
+    //in the handleSubmit function, we call the  function we created our own
     //when the form attampts to submit, the validation will be executed. if there is any error, the handleSubmit function won't call onSubmitForm function
     //instead, it willl call the second function we passed in, which is the onError
     <Form onSubmit={handleSubmit(onSubmitForm, onError)}>
@@ -70,7 +52,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
           type="text"
           id="name"
           {...register("name", { required: "This field is required" })}
-          disabled={isWorking}
+          disabled={isCreating}
         />
       </FormRow>
 
@@ -86,7 +68,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
               message: "Capacity should be at least one",
             },
           })}
-          disabled={isWorking}
+          disabled={isCreating}
         />
       </FormRow>
 
@@ -95,7 +77,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
           type="number"
           id="regularPrice"
           {...register("regularPrice", { required: "This field is required" })}
-          disabled={isWorking}
+          disabled={isCreating}
         />
       </FormRow>
 
@@ -113,7 +95,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
               //pass as a message
               "Disocunt should be less than the regular price",
           })}
-          disabled={isWorking}
+          disabled={isCreating}
         />
       </FormRow>
 
@@ -125,10 +107,8 @@ function CreateCabinForm({ cabinToEdit = {} }) {
           type="number"
           id="description"
           defaultValue=""
-          {...register("description", {
-            required: isEditSession ? false : "This field is required",
-          })}
-          disabled={isWorking}
+          {...register("description", { required: "This field is required" })}
+          disabled={isCreating}
         />
       </FormRow>
 
@@ -146,9 +126,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
         <Button variation="secondary" type="reset">
           Cancel
         </Button>
-        <Button disabled={isWorking}>
-          {isEditSession ? "Edit Cabin" : "Create new Cabin"}
-        </Button>
+        <Button disabled={isCreating}>Add Cabin</Button>
       </FormRow>
     </Form>
   );

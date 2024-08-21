@@ -1,4 +1,13 @@
 import styled from "styled-components";
+import { HiPencil, HiSquare2Stack, HiTrash } from "react-icons/hi2";
+import { formatCurrency } from "../../utils/helpers";
+
+import { useState } from "react";
+import CreateCabinForm from "./CreateCabinForm";
+
+import { useDeleteCabin } from "./useDeleteCabin";
+import { useCraeteCabin } from "./useCreateCabin";
+/* eslint-disable react/prop-types */
 
 const TableRow = styled.div`
   display: grid;
@@ -38,3 +47,63 @@ const Discount = styled.div`
   font-weight: 500;
   color: var(--color-green-700);
 `;
+
+function CabinRow({ cabin }) {
+  const {
+    id: cabinId,
+    name,
+    maxCapacity,
+    regularPrice,
+    discount,
+    image,
+  } = cabin;
+
+  //create a state to control the displaying of form
+  const [showForm, setShowForm] = useState(false);
+  const { isDeleting, deleteCabin } = useDeleteCabin();
+  const { isCreating, createCabin } = useCraeteCabin();
+  function handleDuplicate() {
+    createCabin(
+      // we pass current cabin as newCabin
+      {
+        name: `copy of ${name}`,
+        maxCapacity,
+        regularPrice,
+        discount,
+        image,
+      }
+    );
+  }
+  return (
+    <>
+      <TableRow role="row">
+        <Img src={image} />
+        <Cabin>{name}</Cabin>
+        <div>Fits up to {maxCapacity}</div>
+        <Price>{formatCurrency(regularPrice)}</Price>
+        {discount === 0 ? (
+          <span>&mdash;</span>
+        ) : (
+          <Discount>{formatCurrency(discount)}</Discount>
+        )}
+
+        <div>
+          {/* duplicate cabins */}
+          <button onClick={handleDuplicate} disabled={isCreating}>
+            <HiSquare2Stack />
+          </button>
+          <button onClick={() => setShowForm((show) => !show)}>
+            <HiPencil />
+          </button>
+          <button onClick={() => deleteCabin(cabinId)} disabled={isDeleting}>
+            <HiTrash />
+          </button>
+        </div>
+      </TableRow>
+      {/* and we need to pass data to the form to pre-fill the form */}
+      {showForm && <CreateCabinForm cabinToEdit={cabin} />}
+    </>
+  );
+}
+
+export default CabinRow;

@@ -11,7 +11,7 @@ import Settings from "./pages/Settings";
 import Users from "./pages/Users";
 import PageNotFound from "./pages/PageNotFound";
 import AppLayout from "./ui/AppLayout";
-
+import { Toaster } from "react-hot-toast";
 
 //we set up queryClient to have data in one place like redux and Context API
 const queryClient = new QueryClient({
@@ -42,12 +42,35 @@ const router = createBrowserRouter([
   { path: "*", element: <PageNotFound /> },
 ]);
 function App() {
-  {/*2. povide the data to the entire application tree */ }
+  {
+    /*2. povide the data to the entire application tree */
+  }
   return (
     <QueryClientProvider client={queryClient}>
       {/* the devtool panel is closed by default*/}
-      <ReactQueryDevtools initialIsOpen={false}/>
+      <ReactQueryDevtools initialIsOpen={false} />
       <GlobalStyles />
+      {/* toast component used to manage notifications */}
+      <Toaster
+        position="top-center"
+        gutter={12}
+        containerStyle={{ margin: "8px" }}
+        toastOptions={{
+          success: {
+            duration: 3000,
+          },
+          error: {
+            duration: 5000,
+          },
+          style: {
+            fontSize: "16px",
+            maxWidth: "500px",
+            padding: "16px 24px",
+            backgroundColor: "var(--color-grey-0)",
+            color: "var(--color-grey-700)",
+          },
+        }}
+      />
       <RouterProvider router={router}></RouterProvider>
     </QueryClientProvider>
   );

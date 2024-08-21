@@ -1,7 +1,8 @@
+import { useQuery } from "@tanstack/react-query";
 import styled from "styled-components";
 import Spinner from "../../ui/Spinner";
 import CabinRow from "../cabins/CabinRow";
-import { useCabins } from "./useCabins";
+import {  getCabins } from "../../services/apiCabins";
 /*eslint-disable no-unused-vars */
 const Table = styled.div`
   border: 1px solid var(--color-grey-200);
@@ -26,7 +27,18 @@ const TableHeader = styled.header`
 `;
 
 function CabinTable() {
-  const { isLoading, cabins } = useCabins();
+  //use react query to fetch cabin data
+  // we pass an object: 1. queryKey which can uniquely identify this data that we are querying and need to be an array
+  // so if we want to use the same data in another page, we can use this key, the data will then read from cache
+  //2.queryFn is the function for fetching data from API
+  const {
+    isLoading,
+    data: cabins,
+    error,
+  } = useQuery({ queryKey: ["cabins"], queryFn: getCabins });
+
+
+
   if (isLoading) return <Spinner />;
   return (
     // because we are using div to create the table
