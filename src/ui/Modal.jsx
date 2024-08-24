@@ -1,4 +1,7 @@
+import { createPortal } from "react-dom";
+import { HiXMark } from "react-icons/hi2";
 import styled from "styled-components";
+/*eslint-disable  react/prop-types */
 
 const StyledModal = styled.div`
   position: fixed;
@@ -48,3 +51,20 @@ const Button = styled.button`
     color: var(--color-grey-500);
   }
 `;
+
+function Modal({ children, onClose }) {
+  return createPortal(
+    //1. the JSX we want to render
+    <Overlay>
+      <StyledModal>
+        <div>{children}</div>
+        <Button onClick={onClose}>
+          <HiXMark />
+        </Button>
+      </StyledModal>
+    </Overlay>,
+    //where so we want to render
+    document.body
+  );
+}
+export default Modal;
