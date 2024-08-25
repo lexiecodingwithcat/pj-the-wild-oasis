@@ -1,4 +1,4 @@
-import { useQueryClient } from "@tanstack/react-query";
+
 /* eslint-disable no-unused-vars*/
 /*eslint-disable react/prop-types */
 import Input from "../../ui/Input";
@@ -25,7 +25,6 @@ function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
     defaultValues: isEditSession ? editValues : {},
   });
 
-  const queryClient = useQueryClient();
 
   //we need to get error from console and display it into the UI
   //formState is an object

@@ -1,9 +1,8 @@
-import { cloneElement, createContext, useContext, useState } from "react";
 import { createPortal } from "react-dom";
 import { HiXMark } from "react-icons/hi2";
 import styled from "styled-components";
 /*eslint-disable  react/prop-types */
-/*eslint-diable react/no-unused-vars */
+
 const StyledModal = styled.div`
   position: fixed;
   top: 50%;
@@ -53,49 +52,19 @@ const Button = styled.button`
   }
 `;
 
-//1. create context API
-const ModalContext = createContext();
-//2. create parent component
-function Modal({ children }) {
-  //we need to track which is the currentlt open window
-  const [openName, setOpenName] = useState("");
-  const close = () => setOpenName("");
-  // const open = () => setOpenName;
-  return (
-    <ModalContext.Provider value={{ setOpenName, openName, close }}>
-      {children}
-    </ModalContext.Provider>
-  );
-}
-//3. create children components
-function Open({ children, openWindowName }) {
-  const { setOpenName } = useContext(ModalContext);
-  //we can use cloneElemnt to clone the children elements
-  // so that we can add onClick to the child element
-  //because we are not able to pass the onClick function directly to the button
-  return cloneElement(children, { onClick: () => setOpenName(openWindowName) });
-}
-
-function Window({ children, name }) {
-  const { openName, close } = useContext(ModalContext);
-  if (name !== openName) return null;
+function Modal({ children, onClose }) {
   return createPortal(
     //1. the JSX we want to render
     <Overlay>
       <StyledModal>
-        <div>{cloneElement(children, { onCloseModal: close })}</div>
-        <Button onClick={close}>
+        <div>{children}</div>
+        <Button onClick={onClose}>
           <HiXMark />
         </Button>
       </StyledModal>
     </Overlay>,
-    //where  we want to render
+    //where so we want to render
     document.body
   );
 }
-
-//4.set children components as properties of the parent components
-Modal.Open = Open;
-Modal.Window = Window;
-
 export default Modal;
