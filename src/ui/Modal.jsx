@@ -2,13 +2,12 @@ import {
   cloneElement,
   createContext,
   useContext,
-  useEffect,
-  useRef,
   useState,
 } from "react";
 import { createPortal } from "react-dom";
 import { HiXMark } from "react-icons/hi2";
 import styled from "styled-components";
+import { useOutsideClick } from "../hooks/useOutsideClick";
 /*eslint-disable  react/prop-types */
 /*eslint-diable react/no-unused-vars */
 const StyledModal = styled.div`
@@ -85,23 +84,7 @@ function Open({ children, openWindowName }) {
 
 function Window({ children, name }) {
   const { openName, close } = useContext(ModalContext);
-  const ref = useRef();
-
-  useEffect(function () {
-    //we need to define the function cuz we need to clean it up later
-    function handleClick(e) {
-      //if there is a DOM stored in the ref, which means that the styledModal exists
-      //and the element we clicked is not inside of the ref DOM
-      if (ref.current && !ref.current.contains(e.target)) {
-        //close the window
-        close();
-
-      }
-    }
-    //trigger the event in capture phase instead of bubble phase
-    document.addEventListener("click", handleClick, true);
-    return () => document.removeEventListener("click", handleClick);
-  }, [close]);
+  const ref = useOutsideClick(close);
 
   if (name !== openName) return null;
   return createPortal(
@@ -114,7 +97,7 @@ function Window({ children, name }) {
         </Button>
       </StyledModal>
     </Overlay>,
-    //where  we want to render
+    //where we want to render
     document.body
   );
 }
