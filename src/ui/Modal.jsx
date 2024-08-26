@@ -1,4 +1,11 @@
-import { cloneElement, createContext, useContext, useState } from "react";
+import {
+  cloneElement,
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import { HiXMark } from "react-icons/hi2";
 import styled from "styled-components";
@@ -78,11 +85,29 @@ function Open({ children, openWindowName }) {
 
 function Window({ children, name }) {
   const { openName, close } = useContext(ModalContext);
+  const ref = useRef();
+
+  useEffect(function () {
+    //we need to define the function cuz we need to clean it up later
+    function handleClick(e) {
+      //if there is a DOM stored in the ref, which means that the styledModal exists
+      //and the element we clicked is not inside of the ref DOM
+      if (ref.current && !ref.current.contains(e.target)) {
+        //close the window
+        close();
+
+      }
+    }
+    //trigger the event in capture phase instead of bubble phase
+    document.addEventListener("click", handleClick, true);
+    return () => document.removeEventListener("click", handleClick);
+  }, [close]);
+
   if (name !== openName) return null;
   return createPortal(
     //1. the JSX we want to render
     <Overlay>
-      <StyledModal>
+      <StyledModal ref={ref}>
         <div>{cloneElement(children, { onCloseModal: close })}</div>
         <Button onClick={close}>
           <HiXMark />
