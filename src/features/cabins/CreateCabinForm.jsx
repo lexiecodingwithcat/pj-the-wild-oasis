@@ -1,5 +1,4 @@
 
-import { useQueryClient } from "@tanstack/react-query";
 /* eslint-disable no-unused-vars*/
 /*eslint-disable react/prop-types */
 import Input from "../../ui/Input";
@@ -13,7 +12,7 @@ import { useForm } from "react-hook-form";
 import { useCraeteCabin } from "./useCreateCabin";
 import { useEditCabin } from "./useEditCabin";
 
-function CreateCabinForm({ cabinToEdit = {} }) {
+function CreateCabinForm({ cabinToEdit = {}, onCloseModal }) {
   //put other properties into the editValue object
   const { id: editId, ...editValues } = cabinToEdit;
   //we need a variable to control whether we want to edit/ create a cabin
@@ -26,7 +25,6 @@ function CreateCabinForm({ cabinToEdit = {} }) {
     defaultValues: isEditSession ? editValues : {},
   });
 
-  const queryClient = useQueryClient();
 
   //we need to get error from console and display it into the UI
   //formState is an object
@@ -48,7 +46,10 @@ function CreateCabinForm({ cabinToEdit = {} }) {
       createCabin(
         { ...data, image: image },
         {
-          onSuccess: () => reset(),
+          onSuccess: () => {
+            reset();
+            onCloseModal?.();
+          },
         }
       );
     }
@@ -64,7 +65,10 @@ function CreateCabinForm({ cabinToEdit = {} }) {
     //in the handleSubmit function of react hook form, we call the  function we created our own
     //when the form attampts to submit, the validation will be executed. if there is any error, the handleSubmit function won't call onSubmitForm function
     //instead, it willl call the second function we passed in, which is the onError
-    <Form onSubmit={handleSubmit(onSubmitForm, onError)}>
+    <Form
+      onSubmit={handleSubmit(onSubmitForm, onError)}
+      type={onCloseModal ? "modal" : "regular"}
+    >
       <FormRow label="Cabin name" error={errors?.name?.message}>
         <Input
           type="text"
@@ -143,7 +147,12 @@ function CreateCabinForm({ cabinToEdit = {} }) {
 
       <FormRow>
         {/* type is an HTML attribute! */}
-        <Button variation="secondary" type="reset">
+        {/* in case if we want to use the form in other situation and the onCloseModal is not exist */}
+        <Button
+          variation="secondary"
+          type="reset"
+          onClick={() => onCloseModal?.()}
+        >
           Cancel
         </Button>
         <Button disabled={isWorking}>
