@@ -2,6 +2,7 @@ import { createContext, useContext, useState } from "react";
 import { createPortal } from "react-dom";
 import { HiEllipsisVertical } from "react-icons/hi2";
 import styled from "styled-components";
+import { useOutsideClick } from "../hooks/useOutsideClick";
 /*eslint-disable react/prop-types*/
 const Menu = styled.div`
   display: flex;
@@ -70,16 +71,29 @@ function Menus({ children }) {
   const [openId, setOpenId] = useState("");
   const close = () => setOpenId("");
   const open = setOpenId;
+  const [position, setPosition] = useState(null);
   return (
-    <MenusContext.Provider value={{ openId, close, open }}>
+    <MenusContext.Provider
+      value={{ openId, close, position, setPosition, open }}
+    >
       <Menu>{children}</Menu>
     </MenusContext.Provider>
   );
 }
 
 function Toggle({ id }) {
-  const { openId, open, close } = useContext(MenusContext);
-  function handleClick() {
+  const { openId, open, close, setPosition } = useContext(MenusContext);
+
+  function handleClick(e) {
+    // calculate where to put the opened list
+    //find the cloest button near the icon
+    const rect = e.target.closest("button").getBoundingClientRect();
+    setPosition({
+      //innerWidth is the content width inside the window
+      x: window.innerWidth - rect.width - rect.x,
+      y: rect.height + rect.y + 8,
+    });
+
     // if it is not open or if we want to open another, open it
     openId === "" || openId !== id ? open(id) : close();
   }
@@ -90,21 +104,32 @@ function Toggle({ id }) {
   );
 }
 function List({ id, children }) {
-  const { openId } = useContext(MenusContext);
-  // we need to compare the id with current openID
-  // if they are not equal, won't show the list
+  const { openId, position, close } = useContext(MenusContext);
+  //the list will close when we click outside of the list
+  const ref = useOutsideClick(close);
   if (openId !== id) return null;
   //since this list will alos float up on the UI like modal
   // we need createPortal
   return createPortal(
-    <StyledList position={{ x: 20, y: 20 }}>{children}</StyledList>,
+    <StyledList position={position} ref={ref}>
+      {children}
+    </StyledList>,
     document.body
   );
 }
-function Button({ children }) {
+function Button({ children, icon, onClick }) {
+  const { close } = useContext(MenusContext);
+
+  function handleClick() {
+    onClick?.();
+    close();
+  }
   return (
     <li>
-      <StyledButton>{children}</StyledButton>
+      <StyledButton onClick={handleClick}>
+        {icon}
+        <span>{children}</span>
+      </StyledButton>
     </li>
   );
 }
