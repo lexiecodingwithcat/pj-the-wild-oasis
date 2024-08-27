@@ -5,7 +5,6 @@ import { useCabins } from "./useCabins";
 import Table from "../../ui/Table";
 /*eslint-disable no-unused-vars */
 
-
 const TableHeader = styled.header`
   display: grid;
   grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
@@ -35,11 +34,11 @@ function CabinTable() {
         <div>Discount</div>
         <div></div>
       </Table.Header>
-      {cabins.map((cabin) => (
-        <CabinRow key={cabin.id} cabin={cabin} />
-      ))}
-     
-      
+      {/* use render props pattern to tell react what to render and make it reusable */}
+      <Table.Body
+        data={cabins}
+        render={(cabin) => <CabinRow key={cabin.id} cabin={cabin} />}
+      />
     </Table>
   );
 }
