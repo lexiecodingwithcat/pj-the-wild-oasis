@@ -50,7 +50,7 @@ function CabinRow({ cabin }) {
   } = cabin;
 
   const { isDeleting, deleteCabin } = useDeleteCabin();
-  const {  createCabin } = useCraeteCabin();
+  const { isCreating, createCabin } = useCraeteCabin();
   function handleDuplicate() {
     createCabin(
       // we pass current cabin as newCabin
@@ -76,36 +76,47 @@ function CabinRow({ cabin }) {
       )}
 
       <div>
+        {/* duplicate cabins */}
+        <button onClick={handleDuplicate} disabled={isCreating}>
+          <HiSquare2Stack />
+        </button>
         <Modal>
-          <Menus>
-            <Menus.Toggle id={cabinId} />
-            <Menus.List id={cabinId}>
-              <Menus.Button icon={<HiSquare2Stack />} onClick={handleDuplicate}>
-                Duplicate
-              </Menus.Button>
-              <Modal.Open openWindowName="edit">
-                <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
-              </Modal.Open>
-              <Modal.Open openWindowName="delete">
-                <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
-              </Modal.Open>
-            </Menus.List>
+          <Modal.Open openWindowName="edit">
+            <button>
+              <HiPencil />
+            </button>
+          </Modal.Open>
+          <Modal.Window name="edit">
+            {/* and we need to pass data to the form to pre-fill the form */}
+            <CreateCabinForm cabinToEdit={cabin} />
+          </Modal.Window>
 
-            <Modal.Window name="edit">
-              {/* and we need to pass data to the form to pre-fill the form */}
-              <CreateCabinForm cabinToEdit={cabin} />
-            </Modal.Window>
-
-            <Modal.Window name="delete">
-              <ConfirmDelete
-                resourceName="cabin"
-                disabled={isDeleting}
-                //this should be called only after we confirm
-                onConfirm={() => deleteCabin(cabinId)}
-              />
-            </Modal.Window>
-          </Menus>
+          <Modal.Open openWindowName="delete">
+            <button>
+              <HiTrash />
+            </button>
+          </Modal.Open>
+          <Modal.Window name="delete">
+            <ConfirmDelete
+              resourceName="cabin"
+              disabled={isDeleting}
+              //this should be called only after we confirm
+              onConfirm={() => deleteCabin(cabinId)}
+            />
+          </Modal.Window>
         </Modal>
+        <Menus>
+          <Menus.Toggle id={cabinId} />
+          <Menus.List id={cabinId}>
+            <Menus.Button icon={<HiSquare2Stack />} onClick={handleDuplicate}>
+              Duplicate
+            </Menus.Button>
+
+            <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
+
+            <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
+          </Menus.List>
+        </Menus>
       </div>
     </Table.Row>
   );
