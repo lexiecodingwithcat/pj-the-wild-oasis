@@ -9,8 +9,8 @@ import { useCraeteCabin } from "./useCreateCabin";
 import Modal from "../../ui/Modal";
 import ConfirmDelete from "../../ui/ConfirmDelete";
 import Table from "../../ui/Table";
+import Menus from "../../ui/Menus";
 /* eslint-disable react/prop-types */
-
 
 const Img = styled.img`
   display: block;
@@ -64,7 +64,7 @@ function CabinRow({ cabin }) {
     );
   }
   return (
-    <Table.Row >
+    <Table.Row>
       <Img src={image} />
       <Cabin>{name}</Cabin>
       <div>Fits up to {maxCapacity}</div>
@@ -92,7 +92,7 @@ function CabinRow({ cabin }) {
           </Modal.Window>
 
           <Modal.Open openWindowName="delete">
-            <button >
+            <button>
               <HiTrash />
             </button>
           </Modal.Open>
@@ -105,6 +105,14 @@ function CabinRow({ cabin }) {
             />
           </Modal.Window>
         </Modal>
+        <Menus>
+          <Menus.Toggle id={cabin.id} />
+          <Menus.List id={cabin.id}>
+            <Menus.Button>Duplicate</Menus.Button>
+            <Menus.Button>Edit</Menus.Button>
+            <Menus.Button>Delete</Menus.Button>
+          </Menus.List>
+        </Menus>
       </div>
     </Table.Row>
   );
