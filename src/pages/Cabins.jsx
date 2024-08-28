@@ -4,6 +4,7 @@ import Row from "../ui/Row";
 
 import AddCabins from "../features/cabins/AddCabins";
 import CabinTable from "../features/cabins/CabinTable"
+import CabinTableOperatioins from "../features/cabins/CabinTableOperatioins";
 function Cabins() {
   // useEffect(
   //   function () {
@@ -19,7 +20,7 @@ function Cabins() {
     <>
       <Row type="horizontal">
         <Heading as="h1">All cabins</Heading>
-        <p>Filter/ sort</p>
+     <CabinTableOperatioins />
       </Row>
       <Row>
         <CabinTable />
