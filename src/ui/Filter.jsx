@@ -35,7 +35,7 @@ const FilterButton = styled.button`
   }
 `;
 
-function Filter({filterField, options }) {
+function Filter({ filterField, options }) {
   //store the value into the URL
   const [searchParams, setSearchParams] = useSearchParams();
   const currentFilter = searchParams.get(filterField) || options[0].value;
@@ -46,7 +46,6 @@ function Filter({filterField, options }) {
     searchParams.set(filterField, value);
     //pass the searchParams into the setter to trigger re-render
     setSearchParams(searchParams);
- 
   }
   return (
     <StyledFilter>
@@ -55,6 +54,7 @@ function Filter({filterField, options }) {
           key={option.value}
           onClick={() => handleClick(option.value)}
           active={(option.value === currentFilter).toString()}
+          disabled={option.value === currentFilter}
         >
           {option.label}
         </FilterButton>

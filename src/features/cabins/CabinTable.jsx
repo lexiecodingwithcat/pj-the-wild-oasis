@@ -24,13 +24,13 @@ const TableHeader = styled.header`
 function CabinTable() {
   const { isLoading, cabins } = useCabins();
   const [searchParams] = useSearchParams();
-  console.log(cabins);
+
   if (isLoading) return <Spinner />;
   //read the value from param: discount
   //if there is no filter, use all by default
-
+  //==============FILTER===============================
   const filterValue = searchParams.get("discount") || "all";
-  console.log(filterValue);
+  
   let filteredCabins;
   if (filterValue === "all") filteredCabins = cabins;
   if (filterValue === "with-discount") {
@@ -39,7 +39,10 @@ function CabinTable() {
   if (filterValue === "no-discount") {
     filteredCabins = cabins?.filter((cabin) => cabin.discount === 0);
   }
-  console.log(filteredCabins);
+  //=================SortBy==========
+  // const sortedValue = searchParams.get("sortBy");
+  // console.log(sortedValue)
+
   return (
     // we need to wrap eveything into the Menus so that we can know which menu is currently open
     <Menus>
