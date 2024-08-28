@@ -24,17 +24,22 @@ const TableHeader = styled.header`
 function CabinTable() {
   const { isLoading, cabins } = useCabins();
   const [searchParams] = useSearchParams();
-
+  console.log(cabins);
   if (isLoading) return <Spinner />;
   //read the value from param: discount
   //if there is no filter, use all by default
+
   const filterValue = searchParams.get("discount") || "all";
+  console.log(filterValue);
   let filteredCabins;
   if (filterValue === "all") filteredCabins = cabins;
-  if (filterValue === "with-discount")
-    filteredCabins = cabins.filter((cabin) => cabin.discount > 0);
-  if (filterValue === "no-discount")
-    filteredCabins = cabins.filter((cabin) => cabin.discount === 0);
+  if (filterValue === "with-discount") {
+    filteredCabins = cabins?.filter((cabin) => cabin.discount > 0);
+  }
+  if (filterValue === "no-discount") {
+    filteredCabins = cabins?.filter((cabin) => cabin.discount === 0);
+  }
+  console.log(filteredCabins);
   return (
     // we need to wrap eveything into the Menus so that we can know which menu is currently open
     <Menus>
@@ -51,7 +56,7 @@ function CabinTable() {
         </Table.Header>
         {/* use render props pattern to tell react what to render and make it reusable */}
         <Table.Body
-        // data={cabins}
+          // data={cabins}
           data={filteredCabins}
           render={(cabin) => <CabinRow key={cabin.id} cabin={cabin} />}
         />

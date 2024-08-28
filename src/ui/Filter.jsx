@@ -1,6 +1,6 @@
 import { useSearchParams } from "react-router-dom";
 import styled, { css } from "styled-components";
-
+/*eslint-disable react/prop-types */
 const StyledFilter = styled.div`
   border: 1px solid var(--color-grey-100);
   background-color: var(--color-grey-0);
@@ -16,7 +16,7 @@ const FilterButton = styled.button`
   border: none;
 
   ${(props) =>
-    props.active &&
+    props.active === "true" &&
     css`
       background-color: var(--color-brand-600);
       color: var(--color-brand-50);
@@ -35,25 +35,30 @@ const FilterButton = styled.button`
   }
 `;
 
-function Filter() {
+function Filter({filterField, options }) {
   //store the value into the URL
   const [searchParams, setSearchParams] = useSearchParams();
+  const currentFilter = searchParams.get(filterField) || options[0].value;
+
   function handleClick(value) {
     //we are going the pass the value into URL
     //at the beginning, the URL did not have any query params, we we need to set the params first
-    searchParams.set("discount", value);
+    searchParams.set(filterField, value);
     //pass the searchParams into the setter to trigger re-render
     setSearchParams(searchParams);
+ 
   }
   return (
     <StyledFilter>
-      <FilterButton onClick={() => handleClick("all")}>All</FilterButton>
-      <FilterButton onClick={() => handleClick("no-discount")}>
-        No discount
-      </FilterButton>
-      <FilterButton onClick={() => handleClick("with-discount")}>
-        With discount
-      </FilterButton>
+      {options.map((option) => (
+        <FilterButton
+          key={option.value}
+          onClick={() => handleClick(option.value)}
+          active={(option.value === currentFilter).toString()}
+        >
+          {option.label}
+        </FilterButton>
+      ))}
     </StyledFilter>
   );
 }
