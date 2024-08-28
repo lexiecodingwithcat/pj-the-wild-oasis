@@ -30,7 +30,7 @@ function CabinTable() {
   //if there is no filter, use all by default
   //==============FILTER===============================
   const filterValue = searchParams.get("discount") || "all";
-  
+
   let filteredCabins;
   if (filterValue === "all") filteredCabins = cabins;
   if (filterValue === "with-discount") {
@@ -39,10 +39,15 @@ function CabinTable() {
   if (filterValue === "no-discount") {
     filteredCabins = cabins?.filter((cabin) => cabin.discount === 0);
   }
-  //=================SortBy==========
-  // const sortedValue = searchParams.get("sortBy");
-  // console.log(sortedValue)
-
+  //=================Sort==========
+  const sortedValue = searchParams.get("sortBy") || "startDate-asc";
+  const [field, direction] = sortedValue.split("-");
+  const modifier = direction === "asc" ? 1 : -1;
+  //by default a-b is from low to high, asccending way
+  //b-a is descending way
+  const sortedCabins = filteredCabins.sort(
+    (a, b) => (a[field] - b[field]) * modifier
+  );
   return (
     // we need to wrap eveything into the Menus so that we can know which menu is currently open
     <Menus>
@@ -60,7 +65,8 @@ function CabinTable() {
         {/* use render props pattern to tell react what to render and make it reusable */}
         <Table.Body
           // data={cabins}
-          data={filteredCabins}
+          // data={filteredCabins}
+          data={sortedCabins}
           render={(cabin) => <CabinRow key={cabin.id} cabin={cabin} />}
         />
       </Table>
