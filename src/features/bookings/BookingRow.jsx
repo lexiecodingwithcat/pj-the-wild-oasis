@@ -6,7 +6,8 @@ import Table from "../../ui/Table";
 
 import { formatCurrency } from "../../utils/helpers";
 import { formatDistanceFromNow } from "../../utils/helpers";
-
+/*eslint-disable  react/prop-types */
+/*eslint-disable  no-unused-vars */
 const Cabin = styled.div`
   font-size: 1.6rem;
   font-weight: 600;
@@ -67,7 +68,7 @@ function BookingRow({
         <span>
           {isToday(new Date(startDate))
             ? "Today"
-            : formatDistanceFromNow(startDate)}{" "}
+            : formatDistanceFromNow(startDate)}
           &rarr; {numNights} night stay
         </span>
         <span>

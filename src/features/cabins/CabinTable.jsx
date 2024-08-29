@@ -5,6 +5,7 @@ import { useCabins } from "./useCabins";
 import Table from "../../ui/Table";
 import Menus from "../../ui/Menus";
 import { useSearchParams } from "react-router-dom";
+import Empty from "../../ui/Empty";
 /*eslint-disable no-unused-vars */
 
 const TableHeader = styled.header`
@@ -26,6 +27,7 @@ function CabinTable() {
   const [searchParams] = useSearchParams();
 
   if (isLoading) return <Spinner />;
+  if(!cabins.length) return <Empty resourceName="cabins" />
   //read the value from param: discount
   //if there is no filter, use all by default
   //==============FILTER===============================
