@@ -10,9 +10,14 @@ export async function getBookings({ filter, sortBy }) {
       "id, created_at,startDate, endDate, numNights, numGuests, status,totalPrice, cabins(name), guests(fullName, email)"
     );
   //FILTER query conditionally
-  if (filter != null) query[filter.method || "eq"](filter.field, filter.value);
-  const { data: bookings, error } = await query;
+  if (filter) query = query[filter.method || "eq"](filter.field, filter.value);
 
+  //Sort
+  if (sortBy) query = query.order(sortBy.field,
+    //second param: passing ascending as boolean
+    {ascending:sortBy.direction === "asc"});
+
+  const { data: bookings, error } = await query;
   if (error) {
     console.log(error);
     throw new Error("Bookings failed to fetch");
