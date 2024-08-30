@@ -1,14 +1,18 @@
 import { getToday } from "../utils/helpers";
 import supabase from "./supabase";
-
+/*eslint-disable  no-unused-vars */
 //read all bookings from db
-export async function getBookings() {
-  const { data: bookings, error } = await supabase
+export async function getBookings({ filter, sortBy }) {
+  let query = supabase
     .from("bookings")
     // if can also read other table data by the FK
     .select(
       "id, created_at,startDate, endDate, numNights, numGuests, status,totalPrice, cabins(name), guests(fullName, email)"
     );
+  //FILTER query conditionally
+  if (filter != null) query[filter.method || "eq"](filter.field, filter.value);
+  const { data: bookings, error } = await query;
+
   if (error) {
     console.log(error);
     throw new Error("Bookings failed to fetch");
