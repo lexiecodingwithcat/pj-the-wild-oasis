@@ -45,13 +45,13 @@ function CabinTable() {
   const sortedValue = searchParams.get("sortBy") || "startDate-asc";
   const [field, direction] = sortedValue.split("-");
   const modifier = direction === "asc" ? 1 : -1;
-  //by default a-b is from low to high, asccending way
+  //by default a-b is from low to high, ascending way
   //b-a is descending way
   const sortedCabins = filteredCabins.sort(
     (a, b) => (a[field] - b[field]) * modifier
   );
   return (
-    // we need to wrap eveything into the Menus so that we can know which menu is currently open
+    // we need to wrap everything into the Menus so that we can know which menu is currently open
     <Menus>
       {/* // because we are using div to create the table 
       // so giving them role will make browser knows this is a table --- accessibility */}

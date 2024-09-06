@@ -3,12 +3,13 @@ import Table from "../../ui/Table";
 import Menus from "../../ui/Menus";
 import Empty from "../../ui/Empty";
 import Spinner from "../../ui/Spinner";
-
+import Pagination from "../../ui/Pagination";
 import { useBookings } from "./useBookings";
+
 function BookingTable() {
   const { bookings, isLoading } = useBookings();
   if(isLoading) return <Spinner />
-  //if there is no booking, hidde the table
+  //if there is no booking, hide the table
   if (!bookings.length) return <Empty resourceName="bookings" />;
   return (
     <Menus>
@@ -28,6 +29,7 @@ function BookingTable() {
             <BookingRow key={booking.id} booking={booking} />
           )}
         />
+        <Table.Footer><Pagination count={5}/></Table.Footer>
       </Table>
     </Menus>
   );

@@ -4,7 +4,7 @@ import styled from "styled-components";
 /*eslint-disable react/prop-types */
 const StyledTable = styled.div`
   border: 1px solid var(--color-grey-200);
-
+  margin: 0 auto;
   font-size: 1.4rem;
   background-color: var(--color-grey-0);
   border-radius: 7px;
@@ -32,7 +32,6 @@ const StyledHeader = styled(CommonRow)`
 
 const StyledRow = styled(CommonRow)`
   padding: 1.2rem 2.4rem;
-
   &:not(:last-child) {
     border-bottom: 1px solid var(--color-grey-100);
   }
@@ -42,7 +41,7 @@ const StyledBody = styled.section`
   margin: 0.4rem 0;
 `;
 
-const Footer = styled.footer`
+const StyledFooter = styled.footer`
   background-color: var(--color-grey-50);
   display: flex;
   justify-content: center;
@@ -72,7 +71,7 @@ function Table({ columns, children }) {
 function Header({ children }) {
   const { columns } = useContext(TableContext);
   return (
-    //by using as we change the HTML elment to header
+    //by using as we change the HTML element to header
     <StyledHeader role="row" columns={columns} as="header">
       {children}
     </StyledHeader>
@@ -90,9 +89,13 @@ function Body({ data, render }) {
   if (!data.length) return <Empty>No data to show at the moment</Empty>;
   return <StyledBody>{data.map(render)}</StyledBody>;
 }
-// function Footer({ children }) {}
+
+function Footer({ children }) {
+  return <StyledFooter>{children}</StyledFooter>;
+}
 Table.Header = Header;
 Table.Body = Body;
 Table.Row = Row;
+Table.Footer = Footer;
 
 export default Table;
