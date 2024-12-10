@@ -7,8 +7,8 @@ import Pagination from "../../ui/Pagination";
 import { useBookings } from "./useBookings";
 
 function BookingTable() {
-  const { bookings, isLoading } = useBookings();
-  if(isLoading) return <Spinner />
+  const { bookings, isLoading, count } = useBookings();
+  if (isLoading) return <Spinner />;
   //if there is no booking, hide the table
   if (!bookings.length) return <Empty resourceName="bookings" />;
   return (
@@ -29,7 +29,9 @@ function BookingTable() {
             <BookingRow key={booking.id} booking={booking} />
           )}
         />
-        <Table.Footer><Pagination count={5}/></Table.Footer>
+        <Table.Footer>
+          <Pagination count={count} />
+        </Table.Footer>
       </Table>
     </Menus>
   );

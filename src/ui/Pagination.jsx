@@ -1,6 +1,7 @@
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import { useSearchParams } from "react-router-dom";
 import styled from "styled-components";
+import { PAGE_SIZE } from "../utils/constants";
 /*eslint-disable no-unused-vars */
 /*eslint-disable react/prop-types */
 const StyledPagination = styled.div`
@@ -59,8 +60,8 @@ const PaginationButton = styled.button`
   }
 `;
 
-const PAGE_SIZE = 10;
 function Pagination({ count }) {
+  // get current page from URL
   const [searchParams, setSearchParams] = useSearchParams();
   const currentPage = !searchParams.get("page")
     ? 1
@@ -69,7 +70,7 @@ function Pagination({ count }) {
   const pageCount = Math.ceil(count / PAGE_SIZE);
 
   function nextPage() {
-    //if we are already in the last page, the ;ast page will be current page
+    //if we are already in the last page, the last page will be current page
     const next = currentPage === pageCount ? currentPage : currentPage + 1;
     searchParams.set("page", next);
     setSearchParams(searchParams);
@@ -85,9 +86,8 @@ function Pagination({ count }) {
       <P>
         showing <span>{(currentPage - 1) * PAGE_SIZE + 1}</span> to
         <span>
-          {" "}
           {currentPage === pageCount ? count : currentPage * PAGE_SIZE}
-        </span>{" "}
+        </span>
         of
         <span>{count}</span>
         results

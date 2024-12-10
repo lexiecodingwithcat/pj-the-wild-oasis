@@ -1,28 +1,40 @@
+import { PAGE_SIZE } from "../utils/constants";
 import { getToday } from "../utils/helpers";
 import supabase from "./supabase";
 /*eslint-disable  no-unused-vars */
 //read all bookings from db
-export async function getBookings({ filter, sortBy }) {
+export async function getBookings({ filter, sortBy, page }) {
   let query = supabase
     .from("bookings")
     // if can also read other table data by the FK
     .select(
-      "id, created_at,startDate, endDate, numNights, numGuests, status,totalPrice, cabins(name), guests(fullName, email)"
+      "id, created_at,startDate, endDate, numNights, numGuests, status,totalPrice, cabins(name), guests(fullName, email)",
+      //there is another param that can be passed to get the number of result
+      // instead of querying all the data
+      { count: "exact" }
     );
   //FILTER query conditionally
   if (filter) query = query[filter.method || "eq"](filter.field, filter.value);
 
   //Sort
-  if (sortBy) query = query.order(sortBy.field,
-    //second param: passing ascending as boolean
-    {ascending:sortBy.direction === "asc"});
-
-  const { data: bookings, error } = await query;
+  if (sortBy)
+    query = query.order(
+      sortBy.field,
+      //second param: passing ascending as boolean
+      { ascending: sortBy.direction === "asc" }
+    );
+  //Pagination
+  if (page) {
+    const from = (page - 1) * PAGE_SIZE;
+    const to = from + PAGE_SIZE - 1;
+    query = query.range(from, to);
+  }
+  const { data, error, count } = await query;
   if (error) {
     console.log(error);
     throw new Error("Bookings failed to fetch");
   }
-  return bookings;
+  return { data, count };
 }
 
 export async function getBooking(id) {
