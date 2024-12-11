@@ -11,6 +11,8 @@ import DataItem from "../../ui/DataItem";
 import { Flag } from "../../ui/Flag";
 
 import { formatDistanceFromNow, formatCurrency } from "../../utils/helpers";
+/*eslint-disable  react/prop-types */
+/*eslint-disable  no-unused-vars */
 
 const StyledBookingDataBox = styled.section`
   /* Box */

@@ -12,6 +12,7 @@ import Users from "./pages/Users";
 import PageNotFound from "./pages/PageNotFound";
 import AppLayout from "./ui/AppLayout";
 import { Toaster } from "react-hot-toast";
+import Booking from "./pages/Booking";
 
 //we set up queryClient to have data in one place like redux and Context API
 const queryClient = new QueryClient({
@@ -33,6 +34,7 @@ const router = createBrowserRouter([
       { path: "/dashboard", element: <Dashboard /> },
       { path: "/account", element: <Account /> },
       { path: "/bookings", element: <Bookings /> },
+      { path: "/bookings/:bookingId", element: <Booking /> },
       { path: "/cabins", element: <Cabins /> },
       { path: "/settings", element: <Settings /> },
       { path: "/users", element: <Users /> },

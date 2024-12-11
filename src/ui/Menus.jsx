@@ -67,7 +67,7 @@ const StyledButton = styled.button`
 
 const MenusContext = createContext();
 function Menus({ children }) {
-  //we need to track which one is the currently oepn id
+  //we need to track which one is the currently open id
   const [openId, setOpenId] = useState("");
   const close = () => setOpenId("");
   const open = setOpenId;
@@ -134,6 +134,7 @@ function Button({ children, icon, onClick }) {
   );
 }
 
+Menus.Menu = Menu;
 Menus.Toggle = Toggle;
 Menus.List = List;
 Menus.Button = Button;
